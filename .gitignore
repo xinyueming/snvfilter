@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Transvar temp files
+transvar.tem.xls
+transvar.xls
+transvar_output.xls
+*.tem.xls
+
+# Output files
+*.filter.xls
+*.all.xls
+*.filter.germline.xls
+*.all.germline.xls
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
