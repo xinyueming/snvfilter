@@ -1,0 +1,31 @@
+# SNVFilter default configuration
+# Priority: CLI args > user config > default config
+
+input:
+  key_site: null            # 关键位点文件 (combine.tsv)
+  product_gene: null        # 产品基因列表
+  hotspot_gene: null        # 热点基因文件
+  gene_trans: null          # 基因转录本文件
+  annovar_vcf: null         # ANNOVAR VCF 文件
+  gene_categorie: null      # 基因分类文件 (xlsx)
+  hg19_refgene: null        # hg19 refGene 文件
+  hg19_gtf: null            # hg19 GTF 文件
+  modify_varannovar: null   # 修改后的 varannovar 文件
+  depth_tsv: null           # bamdst depth 文件
+  depth_tsv_control: null   # bamdst depth control 文件
+  gene_alias: null          # gene alias 文件
+  local_freq: null          # 本地频率文件 (zip/txt/txt,txt)
+  mrd_filter: null          # MRD 过滤文件
+
+output:
+  prefix: null              # 输出前缀，默认从 VCF 文件名提取
+
+sample:
+  type: blood               # 样本类型: blood/tissue
+  force_germline: false     # 强制胚系模式
+
+flags:
+  debug: false              # 调试模式
+  is_brca: false            # BRCA panel
+  is_lynch: false           # Lynch panel
+  is_105: false             # 105/15 panel

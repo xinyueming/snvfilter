@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "snvfilter"
+version = "0.1.0"
+description = "SNV filtering tool for tumor-normal paired samples"
+requires-python = ">=3.8"
+dependencies = [
+    "pandas",
+    "openpyxl",
+    "pyyaml",
+]
+
+[project.scripts]
+snvfilter = "snvfilter.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["snvfilter*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"
