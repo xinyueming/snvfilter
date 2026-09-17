@@ -168,10 +168,10 @@ def run_filtering(args):
     if not output_prefix:
         output_prefix = os.path.basename(annovar_vcf).replace(".vcf", "")
 
-    filter_xls = f"{output_prefix}.filter.tem.xls"
-    all_xls = f"{output_prefix}.all.tem.xls"
-    germline_filter_xls = f"{output_prefix}.filter.germline.tem.xls"
-    germline_all_xls = f"{output_prefix}.all.germline.tem.xls"
+    filter_xls = f"{output_prefix}.filter.xls"
+    all_xls = f"{output_prefix}.all.xls"
+    germline_filter_xls = f"{output_prefix}.filter.germline.xls"
+    germline_all_xls = f"{output_prefix}.all.germline.xls"
 
     ctx = {
         "product_gene": product_gene,
@@ -249,7 +249,7 @@ def main():
         return
 
     # Check required inputs for run mode
-    required = ["key_site", "product_gene", "hotspot_gene", "annovar_vcf"]
+    required = ["key_site", "product_gene", "hotspot_gene", "gene_trans", "annovar_vcf"]
     merged = load_config(config_file=args.config)
     inp = merged.get("input", {})
     sample = merged.get("sample", {})

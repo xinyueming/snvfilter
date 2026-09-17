@@ -795,8 +795,8 @@ class VariantRow:
     @property
     def debug_somatic_header(self):
         return self.common_debug_header + "\t" + "\t".join([
-            "somatic_rule_1", "somatic_rule_2_1", "somatic_rule_2_2",
-            "somatic_rule_3", "fanal_rule",
+            "somatic_rule_1", "somatic_rule_2", "somatic_rule_3",
+            "somatic_rule_4_1", "somatic_rule_4_2", "final_rule",
         ]) + "\n"
 
     @property
@@ -812,7 +812,7 @@ class VariantRow:
 
     @property
     def debug_somatic_row(self):
-        return f"{self.common_debug_row}\t{self.somatic_rule_1}\t{self.somatic_rule_2}\t{self.somatic_rule_2}\t{self.somatic_rule_3}\t{self.is_somatic_filter}\n"
+        return f"{self.common_debug_row}\t{self.somatic_rule_1}\t{self.somatic_rule_2}\t{self.somatic_rule_3}\t{self.somatic_rule_4_1}\t{self.somatic_rule_4_2}\t{self.is_somatic_filter}\n"
 
     @property
     def debug_germline_row(self):

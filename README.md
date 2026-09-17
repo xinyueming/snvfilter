@@ -88,8 +88,7 @@ snvfilter/
 │   ├── config.py         # 配置加载
 │   ├── rules.py          # 规则模块
 │   ├── filters.py        # 过滤逻辑 (VariantRow)
-│   ├── utils.py          # 工具函数
-│   └── parser.py         # VCF 解析 (预留)
+│   └── utils.py          # 工具函数 (数据加载、解析)
 └── tests/
     ├── test_config.py
     └── test_rules.py
