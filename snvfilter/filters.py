@@ -12,7 +12,7 @@ class VariantRow:
     common_pass_*, etc.) are evaluated lazily.
     """
 
-    def __init__(self, row: str, rules: Rules, **ctx):
+    def __init__(self, row: str, rules: Rules, skip_gene_filter: bool = False, **ctx):
         """
         Parameters
         ----------
@@ -20,6 +20,8 @@ class VariantRow:
             One tab-delimited line from the ANNOVAR VCF.
         rules : Rules
             Loaded rule configuration.
+        skip_gene_filter : bool
+            If True, skip rule_1 (product gene list filter).
         ctx : dict
             Pre-loaded data dicts: product_gene_dict, hotspot_gene_dict,
             key_gene_changes, key_gene_tx, key_gene_tx_supplement,
@@ -30,6 +32,7 @@ class VariantRow:
         """
         self.rules = rules
         self._ctx = ctx
+        self._skip_gene_filter = skip_gene_filter
 
         # context
         self.product_gene = ctx.get("product_gene", "")
@@ -475,6 +478,8 @@ class VariantRow:
     @property
     def rule_1(self):
         """Product gene list filter."""
+        if self._skip_gene_filter:
+            return True
         if "FullRNA.gene.list" in self.product_gene or "zy.wes.gene.list" in self.product_gene:
             if self.gene in self.rules.wes_blacklist:
                 return False

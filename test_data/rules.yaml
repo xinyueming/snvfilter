@@ -1,0 +1,149 @@
+# SNVFilter filtering rules
+# Categories: common, somatic, germline, mrd
+
+common:
+  # 规则一：产品基因列表过滤
+  product_gene_filter:
+    enabled: true
+    wes_blacklist:
+      - USP17L15
+      - USP17L17
+      - USP17L19
+      - MUC2
+      - MUC5AC
+      - ZAN
+      - GOLGA6L2
+      - ZNF717
+      - USP17L25
+      - USP17L20
+      - USP17L11
+
+  # 规则二：结构变异过滤
+  structural_variant_filter:
+    enabled: true
+    exclude_alts:
+      - "<INV>"
+      - "<DEL>"
+      - "<DUP>"
+
+  # 规则三：基因功能过滤
+  gene_function_filter:
+    enabled: true
+    # MET 基因保留的 intron
+    met_retained_introns:
+      - intron13
+      - intron14
+    # 保留的功能类型
+    retained_functions:
+      - exonic
+      - splicing
+    # 排除的同义变异
+    exclude_synonymous: true
+
+  # 规则四：良性变异过滤
+  benign_variant_filter:
+    enabled: true
+    exclude_clinsig:
+      - Benign
+      - Likely_benign
+      - Benign/Likely_benign
+
+  # 规则六：TERT 基因特定突变
+  tert_hotspot:
+    enabled: true
+    positions:
+      - chr5_1295228
+      - chr5_1295250
+      - chr5_1295161
+
+  # 规则七：大片段 indel 过滤
+  large_indel_filter:
+    enabled: true
+    max_length: 50
+    except_genes:
+      - MET
+      - EGFR
+      - HER2
+      - ERBB2
+      - KIT
+      - BCOR
+
+somatic:
+  # 通用通过条件 1：不同样本类型的频率/深度阈值
+  common_pass_1:
+    tissue:
+      af_min: 0.005
+      vd_min: 5
+    blood:
+      af_min: 0.001
+      vd_min: 3
+
+  # 通用通过条件 2：更高阈值
+  common_pass_2:
+    tissue:
+      af_min: 0.01
+      vd_min: 10
+    blood:
+      af_min: 0.005
+      vd_min: 5
+
+  # 通用通过条件 3：VCF FILTER 列
+  common_pass_3:
+    require_pass: true
+
+  # 通用通过条件 4：体系/胚系频率比
+  common_pass_4:
+    min_ratio: 3.0
+
+  # 通用通过条件 5：LCR 区域 indel 过滤
+  common_pass_5:
+    lcr_af_threshold:
+      tissue: 0.03
+      blood: 0.01
+    except_genes:
+      - BRCA1
+      - BRCA2
+      - MLH1
+      - MSH6
+      - PMS2
+      - MSH2
+
+  # 体系规则一：人群频率
+  population_freq:
+    onekg_max: 0.01
+    gnomad_max: 0.01
+    gnomad_af_max: 0.01
+    af_popmax_max: 0.01
+
+  # 体系规则二：克隆性造血过滤
+  clonal_hematopoiesis:
+    af_ratio_max: 1.0
+    fisher_pvalue_max: 0.05
+
+  # 体系规则三：正负链比例
+  strand_bias:
+    min_ratio: 0.2
+    max_ratio: 0.8
+
+  # 局部频率阈值
+  local_freq_max: 0.15
+
+germline:
+  # 胚系规则一：胚系频率
+  af_min: 0.15
+
+  # 胚系规则二：人群频率
+  population_freq:
+    onekg_max: 0.05
+    gnomad_max: 0.05
+    gnomad_af_max: 0.05
+    af_popmax_max: 0.05
+
+  # 胚系规则三：基因类别（遗传相关基因）
+  required_gene_categories:
+    - genetic
+
+mrd:
+  # MRD 过滤中体系/胚系频率比
+  af_ratio_max: 1.0
+  germline_af_min: 0.15

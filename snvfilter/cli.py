@@ -173,6 +173,11 @@ def run_filtering(args):
     germline_filter_xls = f"{output_prefix}.filter.germline.xls"
     germline_all_xls = f"{output_prefix}.all.germline.xls"
 
+    filter_nogene_xls = f"{output_prefix}.filter.nogene.xls"
+    all_nogene_xls = f"{output_prefix}.all.nogene.xls"
+    germline_filter_nogene_xls = f"{output_prefix}.filter.germline.nogene.xls"
+    germline_all_nogene_xls = f"{output_prefix}.all.germline.nogene.xls"
+
     ctx = {
         "product_gene": product_gene,
         "product_gene_dict": product_gene_dict,
@@ -200,18 +205,25 @@ def run_filtering(args):
          open(filter_xls, "w") as fh_o_filter, \
          open(all_xls, "w") as fh_o_all, \
          open(germline_filter_xls, "w") as fh_o_germline_filter, \
-         open(germline_all_xls, "w") as fh_o_germline_all:
+         open(germline_all_xls, "w") as fh_o_germline_all, \
+         open(filter_nogene_xls, "w") as fh_o_filter_nogene, \
+         open(all_nogene_xls, "w") as fh_o_all_nogene, \
+         open(germline_filter_nogene_xls, "w") as fh_o_germline_filter_nogene, \
+         open(germline_all_nogene_xls, "w") as fh_o_germline_all_nogene:
 
         write_header = False
         for line in fh:
             if line.startswith("#"):
                 continue
 
-            v = VariantRow(line, rules, **ctx)
+            v = VariantRow(line, rules, skip_gene_filter=False, **ctx)
+            v_nogene = VariantRow(line, rules, skip_gene_filter=True, **ctx)
 
             if not write_header:
                 hdr = v.debug_somatic_header if debug else v.header
                 for f in [fh_o_filter, fh_o_all, fh_o_germline_filter, fh_o_germline_all]:
+                    f.write(hdr)
+                for f in [fh_o_filter_nogene, fh_o_all_nogene, fh_o_germline_filter_nogene, fh_o_germline_all_nogene]:
                     f.write(hdr)
                 write_header = True
 
@@ -224,6 +236,15 @@ def run_filtering(args):
                     fh_o_all.write(v.debug_somatic_row)
                 if v.is_germline:
                     fh_o_germline_all.write(v.debug_germline_row)
+
+                if v_nogene.somatic_row:
+                    fh_o_filter_nogene.write(v_nogene.debug_somatic_row)
+                if v_nogene.germline_row:
+                    fh_o_germline_filter_nogene.write(v_nogene.debug_germline_row)
+                if v_nogene.is_somatic:
+                    fh_o_all_nogene.write(v_nogene.debug_somatic_row)
+                if v_nogene.is_germline:
+                    fh_o_germline_all_nogene.write(v_nogene.debug_germline_row)
             else:
                 if v.somatic_row:
                     fh_o_filter.write(v.somatic_row)
@@ -233,6 +254,15 @@ def run_filtering(args):
                     fh_o_all.write(v.somatic_row_all)
                 if v.is_germline:
                     fh_o_germline_all.write(v.germline_row_all)
+
+                if v_nogene.somatic_row:
+                    fh_o_filter_nogene.write(v_nogene.somatic_row)
+                if v_nogene.germline_row:
+                    fh_o_germline_filter_nogene.write(v_nogene.germline_row)
+                if v_nogene.is_somatic:
+                    fh_o_all_nogene.write(v_nogene.somatic_row_all)
+                if v_nogene.is_germline:
+                    fh_o_germline_all_nogene.write(v_nogene.germline_row_all)
 
     print(f"Filtering done. Output prefix: {output_prefix}")
 
