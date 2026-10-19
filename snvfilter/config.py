@@ -37,7 +37,7 @@ def load_yaml(path):
     return data or {}
 
 
-def load_config(config_file=None, cli_args=None):
+def load_config(config_file=None, cli_args=None, genome=None):
     """Load and merge configuration layers.
 
     Parameters
@@ -46,6 +46,9 @@ def load_config(config_file=None, cli_args=None):
         Path to a user YAML config file.
     cli_args : dict or None
         Dict of CLI argument overrides (flat or nested).
+    genome : str or None
+        Genome version (e.g. "hg19", "hg38"). When set, the matching
+        ``input.{genome}`` sub-dict is merged into ``input`` as overrides.
 
     Returns
     -------
@@ -60,7 +63,23 @@ def load_config(config_file=None, cli_args=None):
         user_cfg = load_yaml(config_file)
         _deep_merge(config, user_cfg)
 
-    # Layer 3: CLI overrides
+    # Layer 3: genome-specific overrides (before CLI, so CLI can still override)
+    _GENOME_KEYS = ("hg19", "hg38")
+    if genome and genome in config.get("input", {}):
+        genome_cfg = config["input"].pop(genome)
+        # Remove other genome keys too
+        for gk in _GENOME_KEYS:
+            config["input"].pop(gk, None)
+        _deep_merge(config["input"], genome_cfg)
+    elif not genome:
+        # If no genome specified, keep genome sub-dicts as-is
+        pass
+    else:
+        # Genome specified but not in config — still clean up other keys
+        for gk in _GENOME_KEYS:
+            config["input"].pop(gk, None)
+
+    # Layer 4: CLI overrides (highest priority)
     if cli_args:
         _deep_merge(config, cli_args)
 

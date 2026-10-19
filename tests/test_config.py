@@ -79,3 +79,63 @@ class TestLoadRules:
         r.write_text("common:\n  test_key: value\n")
         rules = load_rules(rules_file=str(r))
         assert rules["common"]["test_key"] == "value"
+
+
+class TestGenomeConfig:
+    def test_hg19_merge(self, tmp_path):
+        cfg = tmp_path / "cfg.yaml"
+        cfg.write_text(
+            "input:\n"
+            "  key_site: common.tsv\n"
+            "  hg19:\n"
+            "    refgene: hg19_refgene.txt\n"
+            "    gtf: hg19.gtf\n"
+            "  hg38:\n"
+            "    refgene: hg38_refgene.txt\n"
+            "    gtf: hg38.gtf\n"
+        )
+        c = load_config(config_file=str(cfg), genome="hg19")
+        assert c["input"]["key_site"] == "common.tsv"
+        assert c["input"]["refgene"] == "hg19_refgene.txt"
+        assert c["input"]["gtf"] == "hg19.gtf"
+        # hg38 keys should NOT be merged
+        assert "hg38" not in c["input"]
+
+    def test_hg38_merge(self, tmp_path):
+        cfg = tmp_path / "cfg.yaml"
+        cfg.write_text(
+            "input:\n"
+            "  key_site: common.tsv\n"
+            "  hg19:\n"
+            "    refgene: hg19_refgene.txt\n"
+            "  hg38:\n"
+            "    refgene: hg38_refgene.txt\n"
+            "    gtf: hg38.gtf\n"
+        )
+        c = load_config(config_file=str(cfg), genome="hg38")
+        assert c["input"]["refgene"] == "hg38_refgene.txt"
+        assert c["input"]["gtf"] == "hg38.gtf"
+        assert "hg19" not in c["input"]
+
+    def test_no_genome_no_merge(self, tmp_path):
+        cfg = tmp_path / "cfg.yaml"
+        cfg.write_text(
+            "input:\n"
+            "  key_site: common.tsv\n"
+            "  hg19:\n"
+            "    refgene: hg19_refgene.txt\n"
+        )
+        c = load_config(config_file=str(cfg), genome=None)
+        assert c["input"]["key_site"] == "common.tsv"
+        # hg19 sub-dict stays untouched
+        assert "hg19" in c["input"]
+
+    def test_cli_overrides_genome(self, tmp_path):
+        cfg = tmp_path / "cfg.yaml"
+        cfg.write_text(
+            "input:\n"
+            "  hg19:\n"
+            "    refgene: hg19_refgene.txt\n"
+        )
+        c = load_config(config_file=str(cfg), genome="hg19", cli_args={"input": {"refgene": "cli_refgene.txt"}})
+        assert c["input"]["refgene"] == "cli_refgene.txt"

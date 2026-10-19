@@ -43,6 +43,7 @@ def build_parser():
     # Config
     parser.add_argument("--config", "-C", help="User config YAML file")
     parser.add_argument("--rules", "-R", help="Custom rules YAML file")
+    parser.add_argument("--genome", "-G", choices=["hg19", "hg38"], help="Genome version")
 
     # Input
     parser.add_argument("-k", "--key_site", help="Key site file (combine.tsv)")
@@ -110,7 +111,7 @@ def run_filtering(args):
     """Main filtering pipeline."""
     # Load config layers
     cli_dict = {k: v for k, v in vars(args).items() if v is not None}
-    config = load_config(config_file=args.config, cli_args=cli_dict)
+    config = load_config(config_file=args.config, cli_args=cli_dict, genome=args.genome)
 
     rules = Rules(rules_file=args.rules)
 
@@ -126,8 +127,10 @@ def run_filtering(args):
     gene_trans = args.gene_trans or inp.get("gene_trans")
     annovar_vcf = args.annovar_vcf or inp.get("annovar_vcf")
     gene_categorie = args.gene_categorie or inp.get("gene_categorie")
-    hg19_refgene = args.hg19_refgene or inp.get("hg19_refgene")
-    hg19_gtf = args.hg19_gtf or inp.get("hg19_gtf")
+    # refgene/gtf: genome merge puts them at input.refgene/input.gtf
+    # fallback to old hg19_refgene/hg19_gtf for backward compat
+    hg19_refgene = args.hg19_refgene or inp.get("refgene") or inp.get("hg19_refgene")
+    hg19_gtf = args.hg19_gtf or inp.get("gtf") or inp.get("hg19_gtf")
     modify_varannovar = args.modify_varannovar or inp.get("modify_varannovar")
     depth_tsv = args.depth_tsv or inp.get("depth_tsv")
     depth_tsv_control = args.depth_tsv_control or inp.get("depth_tsv_control")
@@ -280,7 +283,7 @@ def main():
 
     # Check required inputs for run mode
     required = ["key_site", "product_gene", "hotspot_gene", "gene_trans", "annovar_vcf"]
-    merged = load_config(config_file=args.config)
+    merged = load_config(config_file=args.config, genome=args.genome)
     inp = merged.get("input", {})
     sample = merged.get("sample", {})
     flags = merged.get("flags", {})
