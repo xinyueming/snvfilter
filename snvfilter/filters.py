@@ -483,8 +483,11 @@ class VariantRow:
         if "FullRNA.gene.list" in self.product_gene or "zy.wes.gene.list" in self.product_gene:
             if self.gene in self.rules.wes_blacklist:
                 return False
-            if len(self.gene.split("\\x3b")) > 1:
+            elif self.gene.split('\\x3b')[0] in self.rules.wes_blacklist or self.gene.split('\\x3b')[-1] in self.rules.wes_blacklist:
                 return False
+            else:
+                if len(self.gene.split('\\x3b')) > 2:
+                    return False
             return True
         if self.product_gene_dict.get(self.gene) or self.product_gene_dict.get(self.gene_alias_dict.get(self.gene)):
             return True
@@ -507,7 +510,7 @@ class VariantRow:
                 return True
         if "intronic" in self.func and "athogenic" in self.info_dict.get("CLNSIGCONF", "."):
             return True
-        if ("exonic" in self.func or "splicing" in self.func) and "ncRNA" not in self.func:
+        if ("exonic" in self.func and "ncRNA" not in self.func) or "splicing" in self.func:
             if self.exonic_func != "synonymous_SNV":
                 return True
         return False
