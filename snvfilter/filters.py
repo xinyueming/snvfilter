@@ -227,20 +227,20 @@ class VariantRow:
         if self.common_aa_change == ".":
             self.common_aa_change = _match_gene_tx(self.gene_detail, key_gene_tx, default=True)
 
-        p_list_es = ["ASXL1:p.G646Wfs*10"]
+        # p_list_es = ["ASXL1:p.G646Wfs*10"]
         aas = self.common_aa_change.split(":")
         aaa = aas[-1]
-        p_es = f"{gene}:{aaa}"
+        # p_es = f"{gene}:{aaa}"
         if "p." in aaa and "fs" in aaa:
             aaa = aaa.replace("X", "*")
-            if "fs*" in aaa:
-                aaas = aaa.split("fs*")
-                if len(aaas) > 1:
-                    if p_es in p_list_es:
-                        aaas[-1] = str(int(aaas[-1]) + 2)
-                    else:
-                        aaas[-1] = str(int(aaas[-1]) + 1)
-                    aaa = "fs*".join(aaas)
+        #     if "fs*" in aaa:
+        #         aaas = aaa.split("fs*")
+        #         if len(aaas) > 1:
+        #             if p_es in p_list_es:
+        #                 aaas[-1] = str(int(aaas[-1]) + 2)
+        #             else:
+        #                 aaas[-1] = str(int(aaas[-1]) + 1)
+        #             aaa = "fs*".join(aaas)
         aas[-1] = aaa
         self.common_aa_change = ":".join(aas)
 
@@ -307,21 +307,21 @@ class VariantRow:
     @property
     def gene_details_string(self):
         new_changes = []
-        p_list_es = ["ASXL1:p.G646Wfs*10"]
+        # p_list_es = ["ASXL1:p.G646Wfs*10"]
         for aa in self.gene_detail:
             aas = aa.split(":")
             aaa = aas[-1]
-            p_es = f"{self.gene}:{aaa}"
+            # p_es = f"{self.gene}:{aaa}"
             if "p." in aaa and "fs" in aaa:
                 aaa = aaa.replace("X", "*")
-                if "fs*" in aaa:
-                    aaas = aaa.split("fs*")
-                    if len(aaas) > 1:
-                        if p_es in p_list_es:
-                            aaas[-1] = str(int(aaas[-1]) + 2)
-                        else:
-                            aaas[-1] = str(int(aaas[-1]) + 1)
-                        aaa = "fs*".join(aaas)
+                # if "fs*" in aaa:
+                #     aaas = aaa.split("fs*")
+                #     if len(aaas) > 1:
+                #         if p_es in p_list_es:
+                #             aaas[-1] = str(int(aaas[-1]) + 2)
+                #         else:
+                #             aaas[-1] = str(int(aaas[-1]) + 1)
+                #         aaa = "fs*".join(aaas)
             aas[-1] = aaa
             new_changes.append(":".join(aas))
         return ",".join(new_changes)
