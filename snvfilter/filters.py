@@ -284,6 +284,19 @@ class VariantRow:
             self.new_gene = self.gene
         if self.gene in self.gene_alias_dict:
             self.new_gene = self.gene_alias_dict.get(self.gene)
+        
+        # clean up cHGVS and pHGVS for del/dup cases
+        cts = self.new_cdna
+        if 'del' in cts and 'ins' not in cts:
+            cts = cts.split('del')[0] + 'del'
+        elif 'dup' in cts:
+            cts = cts.split('dup')[0] + 'dup'
+        pts = self.new_amid
+        if 'del' in pts and 'ins' not in pts:
+            pts = pts.split('del')[0] + 'del'
+        elif 'dup' in pts:
+            pts = pts.split('dup')[0] + 'dup'
+        self.new_cdna, self.new_amid = cts, pts
 
     # ---- properties ----------------------------------------------------------
 
