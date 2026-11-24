@@ -3,6 +3,7 @@
 import re
 
 from .rules import Rules
+from .utils import normalize_allele
 
 
 class VariantRow:
@@ -424,6 +425,29 @@ class VariantRow:
             return pos + (len_ref - len_alt)
         return pos
 
+    # ---- normalized allele (Pos/Ref/Alt standardization) ---------------------
+
+    @property
+    def norm_pos(self):
+        pos, _ref, _alt = normalize_allele(int(self.arr[1]), self.arr[3], self.arr[4])
+        return pos
+
+    @property
+    def norm_ref(self):
+        _pos, ref, _alt = normalize_allele(int(self.arr[1]), self.arr[3], self.arr[4])
+        return ref
+
+    @property
+    def norm_alt(self):
+        _pos, _ref, alt = normalize_allele(int(self.arr[1]), self.arr[3], self.arr[4])
+        return alt
+
+    @property
+    def norm_end_pos(self):
+        if self.norm_ref == "-":
+            return self.norm_pos + 1
+        return self.norm_pos + len(self.norm_ref) - 1
+
     @property
     def af_string(self):
         if self.af == ".":
@@ -716,7 +740,7 @@ class VariantRow:
             new_amid_clean = new_amid_clean.replace("fs*1", "*")
 
         return "\t".join([str(s) for s in [
-            self.arr[0], self.arr[1], self.end_pos, self.arr[3], self.arr[4],
+            self.arr[0], self.norm_pos, self.norm_end_pos, self.norm_ref, self.norm_alt,
             self.arr[6], self.geneid, self.gene, self.func, self.exonic_func,
             self.common_aa_change, self.gene_details_string,
             self.info_dict.get("simple_repeat", "."),

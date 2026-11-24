@@ -307,3 +307,43 @@ def detect_panel_flags(product_gene):
         "is_hrr": "zy.hrr" in basename,
         "is_wes": "FullRNA" in basename or "zy.wes" in basename,
     }
+
+
+def normalize_allele(pos, ref, alt):
+    """标准化变异等位基因的 Pos/Ref/Alt。
+
+    去除 Ref 和 Alt 的公共前缀碱基，调整 Pos，空值替换为 ``'-'``。
+
+    返回 ``(new_pos, new_ref, new_alt)``。
+
+    示例::
+
+        >>> normalize_allele(686561, "AGG", "A")
+        (686562, 'GG', '-')
+        >>> normalize_allele(3796465, "T", "TGCC")
+        (3796465, '-', 'GCC')
+        >>> normalize_allele(23524386, "TGGGGCTGGGGA", "TTGGGGCTGGGG")
+        (23524387, 'GGGGCTGGGGA', 'TGGGGCTGGGG')
+    """
+    prefix_len = 0
+    min_len = min(len(ref), len(alt))
+    for i in range(min_len):
+        if ref[i] == alt[i]:
+            prefix_len += 1
+        else:
+            break
+
+    # Ref fully consumed (pure ins/dup): keep original Pos as anchor
+    if prefix_len == len(ref):
+        new_pos = pos
+    else:
+        new_pos = pos + prefix_len
+    new_ref = ref[prefix_len:] if prefix_len < len(ref) else ""
+    new_alt = alt[prefix_len:] if prefix_len < len(alt) else ""
+
+    if not new_ref:
+        new_ref = "-"
+    if not new_alt:
+        new_alt = "-"
+
+    return new_pos, new_ref, new_alt
