@@ -195,24 +195,54 @@ def load_resource_gene_categories(gene_categories_file):
     return gene_categorie_dict
 
 
+def _normalize_c_info(c_info):
+    """标准化 c. 信息：去掉 del/dup/ins 后面的碱基，保留 delins。
+
+    >>> _normalize_c_info("c.548T>G")
+    'c.548T>G'
+    >>> _normalize_c_info("c.123delA")
+    'c.123del'
+    >>> _normalize_c_info("c.123dupT")
+    'c.123dup'
+    >>> _normalize_c_info("c.123insT")
+    'c.123ins'
+    >>> _normalize_c_info("c.123delinsABC")
+    'c.123delinsABC'
+    >>> _normalize_c_info("c.123_125del")
+    'c.123_125del'
+    """
+    if not c_info or not c_info.startswith("c."):
+        return c_info
+    if "delins" in c_info:
+        return c_info
+    if "del" in c_info and "ins" not in c_info:
+        return c_info.split("del")[0] + "del"
+    if "dup" in c_info:
+        return c_info.split("dup")[0] + "dup"
+    if "ins" in c_info:
+        return c_info.split("ins")[0] + "ins"
+    return c_info
+
+
 def _extract_tx_and_c(field):
     """从 'GENE:NM_018948.4:exon4:c.548T>G:p.L183X' 提取 (NM_018948, c.548T>G)。
 
     转录本去掉版本号（NM_018948.4 → NM_018948）。
     c. 字段位置不固定，通过前缀识别。
     提取失败返回 None。
+    返回的 c. 信息会标准化（去掉 del/dup/ins 后的碱基）。
     """
     if not field or field == ".":
         return None
     parts = field.split(":")
     tx, c_info = None, None
     for p in parts:
-        if p.startswith("NM_") or p.startswith("NR_"):
+        if p.startswith("NM_") or p.startswith("NR_") or p.startswith("XM_") or p.startswith("XR_"):
             tx = p.split(".")[0]
         elif p.startswith("c."):
             c_info = p
     if tx and c_info:
-        return (tx, c_info)
+        return (tx, _normalize_c_info(c_info))
     return None
 
 
