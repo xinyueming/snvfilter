@@ -3,7 +3,7 @@
 import re
 
 from .rules import Rules
-from .utils import normalize_allele
+from .utils import normalize_allele, _extract_tx_and_c
 
 
 class VariantRow:
@@ -499,7 +499,8 @@ class VariantRow:
         local_freq = 0
         try:
             key1 = tuple(self.arr[:2] + self.arr[3:5])
-            key2 = tuple(self.common_aa_change)
+            tx_key = _extract_tx_and_c(self.common_aa_change)
+            key2 = tx_key if tx_key else key1
             if key2 in anno_db:
                 comment = "\t".join(anno_db[key2]) + "\n"
                 local_freq = float(anno_db[key2][0])

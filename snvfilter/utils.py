@@ -195,6 +195,27 @@ def load_resource_gene_categories(gene_categories_file):
     return gene_categorie_dict
 
 
+def _extract_tx_and_c(field):
+    """从 'GENE:NM_018948.4:exon4:c.548T>G:p.L183X' 提取 (NM_018948, c.548T>G)。
+
+    转录本去掉版本号（NM_018948.4 → NM_018948）。
+    c. 字段位置不固定，通过前缀识别。
+    提取失败返回 None。
+    """
+    if not field or field == ".":
+        return None
+    parts = field.split(":")
+    tx, c_info = None, None
+    for p in parts:
+        if p.startswith("NM_") or p.startswith("NR_"):
+            tx = p.split(".")[0]
+        elif p.startswith("c."):
+            c_info = p
+    if tx and c_info:
+        return (tx, c_info)
+    return None
+
+
 def tr_content_to_anno_dict(content):
     """Parse local frequency annotation text into (header, anno_dict)."""
     anno_dict = {}
@@ -205,7 +226,8 @@ def tr_content_to_anno_dict(content):
         if row[2] == ".":
             key = tuple(row[:2] + row[3:5])
         else:
-            key = tuple(row[2])
+            tx_key = _extract_tx_and_c(row[2])
+            key = tx_key if tx_key else tuple(row[:2] + row[3:5])
         anno_dict[key] = row[5:]
     return header, anno_dict
 
